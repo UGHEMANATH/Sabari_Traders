@@ -105,3 +105,38 @@ exports.setup = async (req, res) => {
         res.status(500).json({ success: false, error: error.message });
     }
 };
+
+exports.signup = async (req, res) => {
+    try {
+        const { name, email, password, phone, address, city, pincode } = req.body;
+
+        if (!email || !password || !name) {
+            return res.status(400).json({ success: false, error: 'Please provide name, email, and password' });
+        }
+
+        const userExists = await prisma.user.findUnique({ where: { email } });
+        if (userExists) {
+            return res.status(400).json({ success: false, error: 'Email already exists' });
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        const password_hash = await bcrypt.hash(password, salt);
+
+        const user = await prisma.user.create({
+            data: {
+                name,
+                email,
+                phone,
+                password_hash,
+                address,
+                city,
+                pincode,
+                role: 'customer'
+            }
+        });
+
+        sendTokenResponse(user, 201, res);
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+};

@@ -4,11 +4,13 @@ const prisma = require('../prisma/client');
 exports.isAuthenticated = async (req, res, next) => {
     let token;
 
-    // Cookie support or Authorization header
+    // Cookie support, Authorization header, or query param (for PDF downloads)
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
         token = req.headers.authorization.split(' ')[1];
     } else if (req.cookies && req.cookies.token) {
         token = req.cookies.token;
+    } else if (req.query && req.query.token) {
+        token = req.query.token;
     }
 
     if (!token) {

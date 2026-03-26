@@ -23,12 +23,20 @@ exports.getBranches = async (req, res) => {
 
 exports.createBranch = async (req, res) => {
     try {
-        const { name, location, manager_name, manager_email, manager_password } = req.body;
+        const { name, location, city, pincode, service_areas, manager_name, manager_email, manager_password } = req.body;
+
+        let formattedServiceAreas = [];
+        if (service_areas) {
+            formattedServiceAreas = service_areas.split(',').map(s => s.trim()).filter(s => s.length > 0);
+        }
 
         let newBranch = await prisma.branch.create({
             data: {
                 name,
-                location
+                location,
+                city,
+                pincode,
+                service_areas: formattedServiceAreas
             }
         });
 
@@ -56,9 +64,14 @@ exports.createBranch = async (req, res) => {
 
 exports.updateBranch = async (req, res) => {
     try {
+        let updateData = { ...req.body };
+        if (updateData.service_areas && typeof updateData.service_areas === 'string') {
+            updateData.service_areas = updateData.service_areas.split(',').map(s => s.trim()).filter(s => s.length > 0);
+        }
+
         const branch = await prisma.branch.update({
             where: { id: req.params.id },
-            data: req.body
+            data: updateData
         });
         res.status(200).json({ success: true, data: branch });
     } catch (error) {

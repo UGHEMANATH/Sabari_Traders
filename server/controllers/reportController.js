@@ -20,6 +20,7 @@ exports.getRevenueReport = async (req, res) => {
         let revenueByBranch = {};
         let totalRevenue = 0;
         let todaysBillsCount = 0;
+        let paymentBreakdown = { cash: 0, gpay: 0, bank_transfer: 0 };
 
         const todayStr = new Date().toISOString().split('T')[0];
 
@@ -28,6 +29,10 @@ exports.getRevenueReport = async (req, res) => {
             if (!revenueByBranch[bName]) revenueByBranch[bName] = 0;
             revenueByBranch[bName] += bill.total_amount;
             totalRevenue += bill.total_amount;
+
+            paymentBreakdown['cash'] += bill.paid_cash || 0;
+            paymentBreakdown['gpay'] += bill.paid_gpay || 0;
+            paymentBreakdown['bank_transfer'] += bill.paid_bank || 0;
 
             // Check if bill was created today
             const billDateStr = new Date(bill.created_at).toISOString().split('T')[0];
@@ -38,7 +43,7 @@ exports.getRevenueReport = async (req, res) => {
 
         res.status(200).json({
             success: true,
-            data: { totalRevenue, revenueByBranch, todaysBillsCount }
+            data: { totalRevenue, revenueByBranch, todaysBillsCount, paymentBreakdown }
         });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Navigate } from 'react-router-dom';
+import { Navigate, Link } from 'react-router-dom';
 
 const Login = () => {
     const { login, user } = useAuth();
@@ -10,6 +10,7 @@ const Login = () => {
     const [loading, setLoading] = useState(false);
 
     if (user) {
+        if (user.role === 'customer') return <Navigate to="/shop" replace />;
         if (user.role === 'staff') return <Navigate to="/billing" replace />;
         return <Navigate to="/dashboard" replace />;
     }
@@ -79,6 +80,10 @@ const Login = () => {
                             {loading ? 'Signing in...' : 'Sign in'}
                         </button>
                     </div>
+                    <p className="text-center text-sm text-gray-500">
+                        New customer?{' '}
+                        <Link to="/signup" className="text-primary-600 font-semibold hover:underline">Create account</Link>
+                    </p>
                 </form>
             </div>
         </div>

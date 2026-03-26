@@ -1,7 +1,8 @@
 import { Outlet, Navigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { LayoutDashboard, Store, Package, FileText, PieChart, LogOut, Menu } from 'lucide-react';
+import { LayoutDashboard, Store, Package, FileText, PieChart, LogOut, Menu, ShoppingBag } from 'lucide-react';
 import { useState } from 'react';
+import NotificationBell from '../components/NotificationBell';
 
 const DashboardLayout = () => {
     const { user, logout } = useAuth();
@@ -16,6 +17,7 @@ const DashboardLayout = () => {
         ...(user.role === 'owner' ? [{ name: 'Users', href: '/users', icon: Store }] : []),
         { name: 'Stock', href: '/stock', icon: Package },
         { name: 'Billing', href: '/billing', icon: FileText },
+        ...(['owner', 'manager'].includes(user.role) ? [{ name: 'Orders', href: '/admin/orders', icon: ShoppingBag }] : []),
         ...(user.role !== 'staff' ? [{ name: 'Reports', href: '/reports', icon: PieChart }] : []),
         ...(user.role === 'owner' ? [{ name: 'Settings (Brands)', href: '/settings', icon: Store }] : []),
     ];
@@ -71,7 +73,8 @@ const DashboardLayout = () => {
                     >
                         <Menu size={24} />
                     </button>
-                    <div className="ml-auto flex items-center gap-4">
+                    <div className="ml-auto flex items-center gap-3">
+                        <NotificationBell />
                         <div className="w-8 h-8 bg-accent-500 rounded-full flex items-center justify-center text-white font-bold">
                             {user.name.charAt(0)}
                         </div>

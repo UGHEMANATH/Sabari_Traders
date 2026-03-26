@@ -71,6 +71,21 @@ const Dashboard = () => {
                 <StatCard title="Today's Bills" value={stats.todaysBillsCount || 0} icon={FileText} color="purple" />
             </div>
 
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                <div className="bg-white border border-gray-100 rounded-xl p-5 flex items-center justify-between shadow-sm hover:shadow-md transition">
+                    <span className="text-gray-500 font-semibold tracking-wide text-xs uppercase">Total Cash Collected</span>
+                    <span className="text-xl font-bold text-gray-900">₹{stats.paymentBreakdown?.cash?.toLocaleString() || 0}</span>
+                </div>
+                <div className="bg-white border border-gray-100 rounded-xl p-5 flex items-center justify-between shadow-sm hover:shadow-md transition">
+                    <span className="text-gray-500 font-semibold tracking-wide text-xs uppercase">GPay / UPI Received</span>
+                    <span className="text-xl font-bold text-gray-900">₹{stats.paymentBreakdown?.gpay?.toLocaleString() || 0}</span>
+                </div>
+                <div className="bg-white border border-gray-100 rounded-xl p-5 flex items-center justify-between shadow-sm hover:shadow-md transition">
+                    <span className="text-gray-500 font-semibold tracking-wide text-xs uppercase">Bank Transfers</span>
+                    <span className="text-xl font-bold text-gray-900">₹{stats.paymentBreakdown?.bank_transfer?.toLocaleString() || 0}</span>
+                </div>
+            </div>
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
                 {/* Revenue Chart */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">

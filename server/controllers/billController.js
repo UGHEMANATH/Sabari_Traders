@@ -2,7 +2,11 @@ const prisma = require('../prisma/client');
 const PDFDocument = require('pdfkit');
 
 exports.createBill = async (req, res) => {
-    let { branch_id, customer_name, customer_phone, items } = req.body;
+    let { branch_id, customer_name, customer_phone, items, paid_cash, paid_gpay, paid_bank } = req.body;
+
+    paid_cash = parseFloat(paid_cash) || 0;
+    paid_gpay = parseFloat(paid_gpay) || 0;
+    paid_bank = parseFloat(paid_bank) || 0;
 
     // items is an array of { brand_id, quantity }
     if (req.user.role === 'manager' || req.user.role === 'staff') {
@@ -44,12 +48,34 @@ exports.createBill = async (req, res) => {
 
         // Start transaction for creating bill, deduxting stock, logging txns
         const newBill = await prisma.$transaction(async (tx) => {
+            let customer_id = null;
+            if (customer_phone) {
+                const balanceOwed = total_amount - (paid_cash + paid_gpay + paid_bank);
+                const customer = await tx.customer.upsert({
+                    where: { phone: customer_phone },
+                    update: {
+                        name: customer_name,
+                        balance: { increment: balanceOwed }
+                    },
+                    create: {
+                        name: customer_name,
+                        phone: customer_phone,
+                        balance: balanceOwed
+                    }
+                });
+                customer_id = customer.id;
+            }
+
             const bill = await tx.bill.create({
                 data: {
                     branch_id,
                     customer_name,
                     customer_phone,
+                    customer_id,
                     total_amount,
+                    paid_cash,
+                    paid_gpay,
+                    paid_bank,
                     items: {
                         create: validatedItems.map(vi => ({
                             brand_id: vi.brand_id,

@@ -8,25 +8,41 @@ generator client {
 }
 
 model User {
-  id             String   @id @default(uuid())
-  name           String
-  email          String   @unique
-  password_hash  String
-  role           String   // "owner" or "manager"
-  branch_id      String?
-  branch         Branch?  @relation(fields: [branch_id], references: [id])
-  created_at     DateTime @default(now())
+  id                  String   @id @default(uuid())
+  name                String
+  email               String   @unique
+  password_hash       String
+  role                String   // "owner", "manager", "staff", "customer"
+  branch_id           String?
+  branch              Branch?  @relation(fields: [branch_id], references: [id])
+  created_at          DateTime @default(now())
+
+  address             String?
+  city                String?
+  pincode             String?
+  phone               String?
+  outstanding_balance Float    @default(0)
+  is_active           Boolean  @default(true)
+
+  orders              Order[]
+  notifications       Notification[]
 }
 
 model Branch {
   id             String   @id @default(uuid())
   name           String
   location       String
+
+  city           String?
+  pincode        String?
+  service_areas  String[]
+
   created_at     DateTime @default(now())
 
   users          User[]
   stock          Stock[]
   bills          Bill[]
+  orders         Order[]
 }
 
 model Brand {
@@ -38,6 +54,7 @@ model Brand {
 
   stock          Stock[]
   bill_items     BillItem[]
+  order_items    OrderItem[]
 }
 
 model Stock {
@@ -72,7 +89,12 @@ model Bill {
   branch_id      String
   customer_name  String
   customer_phone String?
+  customer_id    String?
+  customer       Customer? @relation(fields: [customer_id], references: [id])
   total_amount   Float
+  paid_cash      Float    @default(0)
+  paid_gpay      Float    @default(0)
+  paid_bank      Float    @default(0)
   status         String   @default("active") // "active" or "void"
   created_at     DateTime @default(now())
 
@@ -91,4 +113,68 @@ model BillItem {
 
   bill           Bill     @relation(fields: [bill_id], references: [id])
   brand          Brand    @relation(fields: [brand_id], references: [id])
+}
+
+model Customer {
+  id         String   @id @default(uuid())
+  name       String
+  phone      String   @unique
+  balance    Float    @default(0) // Positive means they owe money
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  bills      Bill[]
+}
+
+model Order {
+  id                      String   @id @default(uuid())
+  order_number            String   @unique
+  customer_id             String
+  branch_id               String?
+  status                  String   @default("pending") // pending | confirmed | processing | out_for_delivery | delivered | cancelled
+  delivery_address        String
+  delivery_city           String
+  delivery_pincode        String
+  requested_delivery_date DateTime?
+  total_amount            Float
+  amount_paid             Float    @default(0)
+  balance_due             Float
+  payment_mode            String   // cod | upi | razorpay | credit
+  payment_status          String   @default("pending") // pending | paid | partial | credit
+  razorpay_order_id       String?
+  razorpay_payment_id     String?
+  note                    String?
+  created_at              DateTime @default(now())
+  updated_at              DateTime @updatedAt
+
+  customer                User     @relation(fields: [customer_id], references: [id])
+  branch                  Branch?  @relation(fields: [branch_id], references: [id])
+  items                   OrderItem[]
+  notifications           Notification[]
+}
+
+model OrderItem {
+  id             String   @id @default(uuid())
+  order_id       String
+  brand_id       String
+  quantity       Int
+  price_per_bag  Float
+  subtotal       Float
+
+  order          Order    @relation(fields: [order_id], references: [id])
+  brand          Brand    @relation(fields: [brand_id], references: [id])
+}
+
+model Notification {
+  id         String   @id @default(uuid())
+  user_id    String
+  title      String
+  message    String
+  type       String   // new_order | order_update | payment | stock_alert
+  is_read    Boolean  @default(false)
+  order_id   String?
+  created_at DateTime @default(now())
+
+  user       User     @relation(fields: [user_id], references: [id])
+  order      Order?   @relation(fields: [order_id], references: [id])
 }

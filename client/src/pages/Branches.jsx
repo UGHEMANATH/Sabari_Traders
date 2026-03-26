@@ -10,6 +10,9 @@ const Branches = () => {
     const [formData, setFormData] = useState({
         name: '',
         location: '',
+        city: '',
+        pincode: '',
+        service_areas: '',
         manager_name: '',
         manager_email: '',
         manager_password: ''
@@ -45,7 +48,7 @@ const Branches = () => {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setShowModal(false);
-            setFormData({ name: '', location: '', manager_name: '', manager_email: '', manager_password: '' });
+            setFormData({ name: '', location: '', city: '', pincode: '', service_areas: '', manager_name: '', manager_email: '', manager_password: '' });
             fetchBranches();
         } catch (error) {
             alert(error.response?.data?.error || 'Failed to create branch');
@@ -86,6 +89,13 @@ const Branches = () => {
                                     </div>
                                 </div>
                             </div>
+                            <div className="mt-4 text-xs text-gray-500">
+                                {branch.service_areas?.length > 0 ? (
+                                    <p><span className="font-semibold text-gray-700">Serves:</span> {branch.service_areas.join(', ')}</p>
+                                ) : (
+                                    <p className="italic">No service areas defined</p>
+                                )}
+                            </div>
                             <div className="mt-4 pt-4 border-t border-gray-50 flex items-center gap-2 text-sm text-gray-600">
                                 <User size={16} />
                                 <span>{manager ? manager.name : 'No Manager Assigned'}</span>
@@ -107,8 +117,20 @@ const Branches = () => {
                                     <input type="text" name="name" required value={formData.name} onChange={handleChange} className="w-full px-3 py-2 border rounded-lg focus:ring-primary-500 focus:border-primary-500" />
                                 </div>
                                 <div className="col-span-2">
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Physical Location Address</label>
                                     <input type="text" name="location" required value={formData.location} onChange={handleChange} className="w-full px-3 py-2 border rounded-lg focus:ring-primary-500 focus:border-primary-500" />
+                                </div>
+                                <div className="col-span-2 sm:col-span-1">
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
+                                    <input type="text" name="city" value={formData.city} onChange={handleChange} className="w-full px-3 py-2 border rounded-lg focus:ring-primary-500 focus:border-primary-500" placeholder="e.g. Tiruppur" />
+                                </div>
+                                <div className="col-span-2 sm:col-span-1">
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Pincode</label>
+                                    <input type="text" name="pincode" value={formData.pincode} onChange={handleChange} className="w-full px-3 py-2 border rounded-lg focus:ring-primary-500 focus:border-primary-500" placeholder="e.g. 641604" />
+                                </div>
+                                <div className="col-span-2">
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Service Areas (Comma separated)</label>
+                                    <input type="text" name="service_areas" value={formData.service_areas} onChange={handleChange} className="w-full px-3 py-2 border rounded-lg focus:ring-primary-500 focus:border-primary-500" placeholder="e.g. Tiruppur, Palladam, Uthukkuli" />
                                 </div>
                                 <div className="col-span-2 mt-4 pt-4 border-t">
                                     <h3 className="text-sm font-semibold text-gray-900 mb-4">Manager Details</h3>
