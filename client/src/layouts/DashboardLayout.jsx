@@ -11,12 +11,12 @@ const DashboardLayout = () => {
     if (!user) return <Navigate to="/login" replace />;
 
     const navigation = [
-        { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+        ...(user.role !== 'staff' ? [{ name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard }] : []),
         ...(user.role === 'owner' ? [{ name: 'Branches', href: '/branches', icon: Store }] : []),
         ...(user.role === 'owner' ? [{ name: 'Users', href: '/users', icon: Store }] : []),
         { name: 'Stock', href: '/stock', icon: Package },
         { name: 'Billing', href: '/billing', icon: FileText },
-        { name: 'Reports', href: '/reports', icon: PieChart },
+        ...(user.role !== 'staff' ? [{ name: 'Reports', href: '/reports', icon: PieChart }] : []),
         ...(user.role === 'owner' ? [{ name: 'Settings (Brands)', href: '/settings', icon: Store }] : []),
     ];
 

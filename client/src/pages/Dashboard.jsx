@@ -68,7 +68,7 @@ const Dashboard = () => {
                 )}
                 <StatCard title="Total Revenue" value={`₹${stats.totalRevenue.toLocaleString()}`} icon={IndianRupee} color="green" />
                 <StatCard title="Total Stock (Bags)" value={totalStock} icon={Package} color="accent" />
-                <StatCard title="Today's Bills" value="--" icon={FileText} color="purple" />
+                <StatCard title="Today's Bills" value={stats.todaysBillsCount || 0} icon={FileText} color="purple" />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">

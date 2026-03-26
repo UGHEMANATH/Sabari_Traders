@@ -10,6 +10,7 @@ const Login = () => {
     const [loading, setLoading] = useState(false);
 
     if (user) {
+        if (user.role === 'staff') return <Navigate to="/billing" replace />;
         return <Navigate to="/dashboard" replace />;
     }
 

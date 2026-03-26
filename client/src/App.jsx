@@ -18,7 +18,11 @@ const ProtectedRoute = ({ children, requiredRole }) => {
 
     if (!user) return <Navigate to="/login" />;
 
-    if (requiredRole && user.role !== requiredRole && user.role !== 'owner') {
+    if (user.role === 'staff' && requiredRole && requiredRole !== 'staff') {
+        return <Navigate to="/billing" />;
+    }
+
+    if (user.role === 'manager' && requiredRole === 'owner') {
         return <Navigate to="/dashboard" />;
     }
 
@@ -33,13 +37,13 @@ function App() {
 
                 <Route path="/" element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
                     <Route index element={<Navigate to="/dashboard" replace />} />
-                    <Route path="dashboard" element={<Dashboard />} />
+                    <Route path="dashboard" element={<ProtectedRoute requiredRole="manager"><Dashboard /></ProtectedRoute>} />
                     <Route path="branches" element={<ProtectedRoute requiredRole="owner"><Branches /></ProtectedRoute>} />
                     <Route path="branches/:id/stock" element={<Stock />} />
                     <Route path="stock" element={<Stock />} />
                     <Route path="billing" element={<Billing />} />
                     <Route path="billing/new" element={<AddBill />} />
-                    <Route path="reports" element={<Reports />} />
+                    <Route path="reports" element={<ProtectedRoute requiredRole="manager"><Reports /></ProtectedRoute>} />
                     <Route path="settings" element={<ProtectedRoute requiredRole="owner"><Settings /></ProtectedRoute>} />
                     <Route path="users" element={<ProtectedRoute requiredRole="owner"><Users /></ProtectedRoute>} />
                 </Route>

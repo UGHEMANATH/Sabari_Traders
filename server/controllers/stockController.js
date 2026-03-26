@@ -3,7 +3,7 @@ const prisma = require('../prisma/client');
 exports.getStock = async (req, res) => {
     try {
         let branch_id = req.query.branch_id;
-        if (req.user.role === 'manager') {
+        if (req.user.role === 'manager' || req.user.role === 'staff') {
             branch_id = req.user.branch_id;
         }
 
@@ -30,7 +30,7 @@ const handleStockTransaction = async (req, res, type) => {
     let { branch_id, brand_id, quantity, note } = req.body;
     quantity = parseInt(quantity);
 
-    if (req.user.role === 'manager') {
+    if (req.user.role === 'manager' || req.user.role === 'staff') {
         branch_id = req.user.branch_id;
     }
 
@@ -99,7 +99,7 @@ exports.getTransactions = async (req, res) => {
         let branch_id = req.query.branch_id;
         const brand_id = req.query.brand_id;
 
-        if (req.user.role === 'manager') {
+        if (req.user.role === 'manager' || req.user.role === 'staff') {
             branch_id = req.user.branch_id;
         }
 

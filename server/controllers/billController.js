@@ -5,7 +5,7 @@ exports.createBill = async (req, res) => {
     let { branch_id, customer_name, customer_phone, items } = req.body;
 
     // items is an array of { brand_id, quantity }
-    if (req.user.role === 'manager') {
+    if (req.user.role === 'manager' || req.user.role === 'staff') {
         branch_id = req.user.branch_id;
     }
 
@@ -92,7 +92,7 @@ exports.createBill = async (req, res) => {
 exports.getBills = async (req, res) => {
     try {
         let branch_id = req.query.branch_id;
-        if (req.user.role === 'manager') {
+        if (req.user.role === 'manager' || req.user.role === 'staff') {
             branch_id = req.user.branch_id;
         }
 

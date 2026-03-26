@@ -7,6 +7,7 @@ const Reports = () => {
     const { user } = useAuth();
     const [transactions, setTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [exportLoading, setExportLoading] = useState(false);
 
     const fetchTransactions = async () => {
         try {
@@ -27,6 +28,7 @@ const Reports = () => {
     }, []);
 
     const downloadCsv = async () => {
+        setExportLoading(true);
         try {
             const token = localStorage.getItem('token');
             const res = await axios.get('http://localhost:5001/api/reports/transactions/export', {
@@ -40,7 +42,9 @@ const Reports = () => {
             document.body.appendChild(link);
             link.click();
         } catch (error) {
-            alert('Export failed');
+            alert('Export failed. Please try again in a few seconds once the connection wakes up.');
+        } finally {
+            setExportLoading(false);
         }
     };
 
@@ -55,10 +59,11 @@ const Reports = () => {
                 </div>
                 <button
                     onClick={downloadCsv}
-                    className="flex items-center gap-2 bg-gray-900 text-white px-4 py-2 rounded-lg font-medium hover:bg-gray-800 transition shadow-sm"
+                    disabled={exportLoading}
+                    className="flex items-center gap-2 bg-gray-900 text-white px-4 py-2 rounded-lg font-medium hover:bg-gray-800 transition shadow-sm disabled:opacity-50"
                 >
                     <Download size={20} />
-                    Export CSV
+                    {exportLoading ? 'Exporting...' : 'Export CSV'}
                 </button>
             </div>
 

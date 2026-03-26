@@ -75,16 +75,18 @@ const Stock = () => {
                     <h1 className="text-2xl font-bold text-gray-900">Stock Inventory</h1>
                     <p className="text-gray-500 mt-1">Manage and track your cement inventory</p>
                 </div>
-                <div className="flex gap-3">
-                    <button onClick={() => openModal('out')} className="flex items-center gap-2 bg-red-50 text-red-600 px-4 py-2 rounded-lg font-medium hover:bg-red-100 transition border border-red-200">
-                        <PackageMinus size={20} />
-                        Manual Stock Out
-                    </button>
-                    <button onClick={() => openModal('in')} className="flex items-center gap-2 bg-primary-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-primary-700 transition">
-                        <PackagePlus size={20} />
-                        Add Stock In
-                    </button>
-                </div>
+                {user.role !== 'staff' && (
+                    <div className="flex gap-3">
+                        <button onClick={() => openModal('out')} className="flex items-center gap-2 bg-red-50 text-red-600 px-4 py-2 rounded-lg font-medium hover:bg-red-100 transition border border-red-200">
+                            <PackageMinus size={20} />
+                            Manual Stock Out
+                        </button>
+                        <button onClick={() => openModal('in')} className="flex items-center gap-2 bg-primary-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-primary-700 transition">
+                            <PackagePlus size={20} />
+                            Add Stock In
+                        </button>
+                    </div>
+                )}
             </div>
 
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
