@@ -1,0 +1,94 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id             String   @id @default(uuid())
+  name           String
+  email          String   @unique
+  password_hash  String
+  role           String   // "owner" or "manager"
+  branch_id      String?
+  branch         Branch?  @relation(fields: [branch_id], references: [id])
+  created_at     DateTime @default(now())
+}
+
+model Branch {
+  id             String   @id @default(uuid())
+  name           String
+  location       String
+  created_at     DateTime @default(now())
+
+  users          User[]
+  stock          Stock[]
+  bills          Bill[]
+}
+
+model Brand {
+  id             String   @id @default(uuid())
+  name           String
+  manufacturer   String
+  price_per_bag  Float
+  created_at     DateTime @default(now())
+
+  stock          Stock[]
+  bill_items     BillItem[]
+}
+
+model Stock {
+  id           String   @id @default(uuid())
+  branch_id    String
+  brand_id     String
+  quantity     Int      @default(0)
+  updated_at   DateTime @updatedAt
+
+  branch       Branch   @relation(fields: [branch_id], references: [id])
+  brand        Brand    @relation(fields: [brand_id], references: [id])
+  transactions StockTransaction[]
+
+  @@unique([branch_id, brand_id])
+}
+
+model StockTransaction {
+  id           String   @id @default(uuid())
+  stock_id     String
+  type         String   // "in" or "out"
+  quantity     Int
+  note         String?
+  bill_id      String?
+  created_at   DateTime @default(now())
+
+  stock        Stock    @relation(fields: [stock_id], references: [id])
+  bill         Bill?    @relation(fields: [bill_id], references: [id])
+}
+
+model Bill {
+  id             String   @id @default(uuid())
+  branch_id      String
+  customer_name  String
+  customer_phone String?
+  total_amount   Float
+  status         String   @default("active") // "active" or "void"
+  created_at     DateTime @default(now())
+
+  branch         Branch   @relation(fields: [branch_id], references: [id])
+  items          BillItem[]
+  stock_txns     StockTransaction[]
+}
+
+model BillItem {
+  id             String   @id @default(uuid())
+  bill_id        String
+  brand_id       String
+  quantity       Int
+  price_per_bag  Float
+  subtotal       Float
+
+  bill           Bill     @relation(fields: [bill_id], references: [id])
+  brand          Brand    @relation(fields: [brand_id], references: [id])
+}
