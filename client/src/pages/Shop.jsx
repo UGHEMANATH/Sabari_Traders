@@ -131,7 +131,7 @@ const Shop = () => {
                                         </div>
                                         <button onClick={() => handleAdd(brand)}
                                             className={`w-full py-3 rounded-xl font-bold text-sm transition ${addedIds[brand.id] ? 'bg-emerald-500 text-white' : 'bg-primary-600 hover:bg-primary-700 text-white'}`}>
-                                            {addedIds[brand.id] ? '✓ Added to Cart!' : 'Add to Cart'}
+                                            {addedIds[brand.id] ? '✓ Added to Cart!' : 'Buy Now'}
                                         </button>
                                     </>
                                 )}

@@ -12,16 +12,21 @@ const assignBranch = async (delivery_city) => {
     const branches = await prisma.branch.findMany();
     const cityLower = delivery_city.toLowerCase().trim();
 
-    // Exact match in service_areas
+    // Exact match in service_areas, location or name
     const exactMatch = branches.find(b =>
-        b.service_areas.some(area => area.toLowerCase().trim() === cityLower)
+        (b.service_areas && b.service_areas.some(area => area.toLowerCase().trim() === cityLower)) ||
+        (b.location && b.location.toLowerCase().trim() === cityLower) ||
+        (b.name && b.name.toLowerCase().trim().replace(' branch', '') === cityLower)
     );
     if (exactMatch) return exactMatch;
 
     // Partial match
-    const partialMatch = branches.find(b =>
-        b.service_areas.some(area => area.toLowerCase().includes(cityLower) || cityLower.includes(area.toLowerCase()))
-    );
+    const partialMatch = branches.find(b => {
+        const inServiceAreas = b.service_areas && b.service_areas.some(area => area.toLowerCase().includes(cityLower) || cityLower.includes(area.toLowerCase()));
+        const inLocation = b.location && (b.location.toLowerCase().includes(cityLower) || cityLower.includes(b.location.toLowerCase()));
+        const inName = b.name && (b.name.toLowerCase().includes(cityLower) || cityLower.includes(b.name.toLowerCase().replace(' branch', '')));
+        return inServiceAreas || inLocation || inName;
+    });
     if (partialMatch) return partialMatch;
 
     // Default: first branch
